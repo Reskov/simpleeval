@@ -650,6 +650,16 @@ class TestComprehensions(DRYTest):
             self.s.eval('x')
 
 
+class TestDictComprehensions(DRYTest):
+    """ Test the comprehensions support of the compound-types edition of the class. """
+
+    def setUp(self):
+        self.s = EvalWithCompoundTypes()
+
+    def test_basic(self):
+        self.t('{a: a for a in [1,2,3]}', {1: 1, 2: 2, 3: 3})
+
+
 class TestNames(DRYTest):
     """ 'names', what other languages call variables... """
 

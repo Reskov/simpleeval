@@ -524,6 +524,7 @@ class EvalWithCompoundTypes(SimpleEval):
             ast.List: self._eval_list,
             ast.Set: self._eval_set,
             ast.ListComp: self._eval_comprehension,
+            ast.DictComp: lambda node: self._eval_comprehension(node, is_dict=True),
             ast.GeneratorExp: self._eval_comprehension,
         })
 
@@ -544,8 +545,8 @@ class EvalWithCompoundTypes(SimpleEval):
     def _eval_set(self, node):
         return set(self._eval(x) for x in node.elts)
 
-    def _eval_comprehension(self, node):
-        to_return = []
+    def _eval_comprehension(self, node, is_dict=False):
+        to_return = {} if is_dict else []
 
         extra_names = {}
 
@@ -584,7 +585,10 @@ class EvalWithCompoundTypes(SimpleEval):
                     if len(node.generators) > gi + 1:
                         do_generator(gi+1)
                     else:
-                        to_return.append(self._eval(node.elt))
+                        if is_dict:
+                            to_return[self._eval(node.key)] = self._eval(node.value)
+                        else:
+                            to_return.append(self._eval(node.elt))
 
         try:
             do_generator()
